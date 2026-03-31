@@ -209,3 +209,17 @@ button:hover {
 .product {
   overflow: visible;
 }
+
+/* 📄 PRODUCT PAGE LAYOUT */
+.product-detail {
+  max-width: 800px;
+  margin: auto;
+}
+
+/* 🔥 ẢNH FULL GỐC */
+.product-detail-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 20px auto;
+}
