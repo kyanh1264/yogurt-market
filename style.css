@@ -172,3 +172,28 @@ button:hover {
   border-radius: 50%;
   object-fit: cover;
 }
+
+/* PROFILE HEADER */
+.profile-header {
+  position: relative;
+}
+
+/* BANNER */
+.profile-banner {
+  height: 180px;
+  background: linear-gradient(45deg, #00c6ff, #0072ff);
+}
+
+/* INFO */
+.profile-info {
+  text-align: center;
+  margin-top: -60px;
+}
+
+/* AVATAR */
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #111;
+}

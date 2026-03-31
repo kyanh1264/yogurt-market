@@ -1,24 +1,30 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
     <title>Profile</title>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
-    <input type="text" id="username" placeholder="New username" />
-    <button onclick="updateProfile()">Save</button>
+    <!-- HEADER -->
+    <div class="profile-header">
+      <div class="profile-banner"></div>
+
+      <div class="profile-info">
+        <img id="avatar" class="profile-avatar" />
+        <h2 id="username"></h2>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
     <div class="container">
-      <a href="index.html">⬅ Back</a>
-
-      <div class="profile-box" id="profile-box"></div>
-
-      <h2>Your Products</h2>
+      <h3>Your Products</h3>
       <div id="product-list"></div>
     </div>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
       import {
         getFirestore,
         collection,
@@ -26,12 +32,13 @@
         where,
         onSnapshot,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
       import {
         getAuth,
         onAuthStateChanged,
-        signOut,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+      // CONFIG
       const firebaseConfig = {
         apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
         authDomain: "new-a6.firebaseapp.com",
@@ -45,13 +52,16 @@
       const db = getFirestore(app);
       const auth = getAuth(app);
 
-      const profileBox = document.getElementById("profile-box");
+      const avatar = document.getElementById("avatar");
+      const usernameEl = document.getElementById("username");
       const productList = document.getElementById("product-list");
 
+      // FORMAT PRICE
       function formatVND(price) {
         return Number(price).toLocaleString("vi-VN") + "₫";
       }
 
+      // USER STATE
       onAuthStateChanged(auth, (user) => {
         if (!user) {
           alert("Login first!");
@@ -59,22 +69,14 @@
           return;
         }
 
-        const avatar = `https://ui-avatars.com/api/?name=${user.email}`;
+        const name = user.displayName || user.email;
 
-        // 👤 PROFILE UI
-        profileBox.innerHTML = `
-              <div style="text-align:center; margin-bottom:20px;">
-                <img src="${avatar}" style="width:80px; border-radius:50%;">
-                <h3>${user.email}</h3>
-                <button onclick="logout()">Logout</button>
-              </div>
-            `;
+        // 👤 hiển thị info
+        avatar.src = `https://ui-avatars.com/api/?name=${name}&size=200`;
+        usernameEl.innerText = name;
 
-        // 🧴 LOAD USER PRODUCTS
-        const q = query(
-          collection(db, "products"),
-          where("user", "==", user.email),
-        );
+        // 🧴 load sản phẩm của user
+        const q = query(collection(db, "products"), where("user", "==", name));
 
         onSnapshot(q, (snapshot) => {
           productList.innerHTML = "";
@@ -83,48 +85,22 @@
             const p = doc.data();
 
             productList.innerHTML += `
-                  <div class="product">
-                    <img src="${p.image}">
-                    <div class="product-content">
-                      <h3>${p.name}</h3>
-                      <p class="product-price">${formatVND(p.price)}</p>
-                      <p>${p.desc}</p>
-                    </div>
-                  </div>
-                `;
+        <div class="product" onclick="goToProduct('${doc.id}')">
+          <img src="${p.image}">
+
+          <div class="product-content">
+            <h3>${p.name}</h3>
+            <p>${formatVND(p.price)}</p>
+          </div>
+        </div>
+      `;
           });
         });
       });
 
-      window.logout = async () => {
-        await signOut(auth);
-        window.location.href = "index.html";
-      };
-
-      import {
-        collection,
-        query,
-        where,
-        getDocs,
-        updateDoc,
-      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-      window.updateProfile = async () => {
-        const newName = document.getElementById("username").value;
-
-        const q = query(
-          collection(db, "users"),
-          where("uid", "==", currentUser.uid),
-        );
-        const snapshot = await getDocs(q);
-
-        snapshot.forEach(async (docSnap) => {
-          await updateDoc(docSnap.ref, {
-            username: newName,
-          });
-        });
-
-        alert("Updated!");
+      // GO PRODUCT
+      window.goToProduct = (id) => {
+        window.location.href = "product.html?id=" + id;
       };
     </script>
   </body>
