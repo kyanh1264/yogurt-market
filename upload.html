@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Upload Product</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Upload Product</h2>
+
+      <input type="text" id="name" placeholder="Product name" />
+      <input type="number" id="price" placeholder="Price" />
+      <textarea id="desc" placeholder="Description"></textarea>
+      <input type="text" id="imageUrl" placeholder="Image URL" />
+
+      <button id="upload">Upload</button>
+      <a href="index.html">⬅ Back</a>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSy...",
+        authDomain: "new-a6.firebaseapp.com",
+        projectId: "new-a6",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let currentUser = null;
+
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          alert("Login first!");
+          window.location.href = "login.html";
+        } else {
+          currentUser = user;
+        }
+      });
+
+      document.getElementById("upload").onclick = async () => {
+        await addDoc(collection(db, "products"), {
+          name: name.value,
+          price: price.value,
+          desc: desc.value,
+          image: imageUrl.value,
+          user: currentUser.email,
+          createdAt: new Date(),
+        });
+
+        alert("Uploaded!");
+      };
+    </script>
+  </body>
+</html>

@@ -13,33 +13,10 @@
         <div>
           <a href="login.html" class="nav-btn">Sign In</a>
           <a href="login.html" class="nav-btn">Sign Up</a>
+          <a href="upload.html" class="nav-btn">+ Upload</a>
         </div>
       </div>
 
-      <!-- AUTH -->
-      <div class="auth-box">
-        <input type="email" id="email" placeholder="Email" />
-        <input type="password" id="password" placeholder="Password" />
-
-        <button id="signup">Sign Up</button>
-        <button id="login">Login</button>
-        <button id="logout">Logout</button>
-
-        <p id="user-info">Not logged in</p>
-      </div>
-
-      <!-- UPLOAD -->
-      <div class="upload-box">
-        <input type="text" id="name" placeholder="Product name" />
-        <input type="number" id="price" placeholder="Price" />
-        <textarea id="desc" placeholder="Description"></textarea>
-        <input type="text" id="imageUrl" placeholder="Paste image URL" />
-        <button id="upload">Upload</button>
-      </div>
-      <h2>Products</h2>
-      <div id="product-list"></div>
-
-      <!-- 🔥 FIREBASE + APP -->
       <script type="module">
         // Firebase imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -78,10 +55,6 @@
         const email = document.getElementById("email");
         const password = document.getElementById("password");
         const userInfo = document.getElementById("user-info");
-
-        const name = document.getElementById("name");
-        const price = document.getElementById("price");
-        const desc = document.getElementById("desc");
 
         const productList = document.getElementById("product-list");
 
@@ -140,33 +113,6 @@
         window.goProfile = () => {
           window.location.href = "profile.html";
         };
-
-        // UPLOAD PRODUCT
-        const imageUrl = document.getElementById("imageUrl");
-
-        document.getElementById("upload").onclick = async () => {
-          if (!currentUser) {
-            alert("Login first!");
-            return;
-          }
-
-          if (!imageUrl.value) {
-            alert("Paste image URL!");
-            return;
-          }
-
-          await addDoc(collection(db, "products"), {
-            name: name.value,
-            price: price.value,
-            desc: desc.value,
-            image: imageUrl.value,
-            user: currentUser.email,
-            createdAt: new Date(),
-          });
-
-          alert("Uploaded!");
-        };
-
         // DISPLAY PRODUCTS (REALTIME)
         const q = query(
           collection(db, "products"),

@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <input type="text" id="username" placeholder="New username" />
+    <button onclick="updateProfile()">Save</button>
     <div class="container">
       <a href="index.html">⬅ Back</a>
 
@@ -58,12 +60,12 @@
 
         // 👤 PROFILE UI
         profileBox.innerHTML = `
-      <div style="text-align:center; margin-bottom:20px;">
-        <img src="${avatar}" style="width:80px; border-radius:50%;">
-        <h3>${user.email}</h3>
-        <button onclick="logout()">Logout</button>
-      </div>
-    `;
+              <div style="text-align:center; margin-bottom:20px;">
+                <img src="${avatar}" style="width:80px; border-radius:50%;">
+                <h3>${user.email}</h3>
+                <button onclick="logout()">Logout</button>
+              </div>
+            `;
 
         // 🧴 LOAD USER PRODUCTS
         const q = query(
@@ -78,23 +80,48 @@
             const p = doc.data();
 
             productList.innerHTML += `
-          <div class="product">
-            <img src="${p.image}">
-            <div class="product-content">
-              <h3>${p.name}</h3>
-              <p class="product-price">${formatVND(p.price)}</p>
-              <p>${p.desc}</p>
-            </div>
-          </div>
-        `;
+                  <div class="product">
+                    <img src="${p.image}">
+                    <div class="product-content">
+                      <h3>${p.name}</h3>
+                      <p class="product-price">${formatVND(p.price)}</p>
+                      <p>${p.desc}</p>
+                    </div>
+                  </div>
+                `;
           });
         });
       });
 
-      // 🚪 LOGOUT
       window.logout = async () => {
         await signOut(auth);
         window.location.href = "index.html";
+      };
+
+      import {
+        collection,
+        query,
+        where,
+        getDocs,
+        updateDoc,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+      window.updateProfile = async () => {
+        const newName = document.getElementById("username").value;
+
+        const q = query(
+          collection(db, "users"),
+          where("uid", "==", currentUser.uid),
+        );
+        const snapshot = await getDocs(q);
+
+        snapshot.forEach(async (docSnap) => {
+          await updateDoc(docSnap.ref, {
+            username: newName,
+          });
+        });
+
+        alert("Updated!");
       };
     </script>
   </body>
