@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Product</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <a href="index.html">⬅ Back</a>
+
+      <div id="product-detail"></div>
+
+      <h3>Comments</h3>
+      <div id="comments"></div>
+
+      <input type="text" id="commentInput" placeholder="Write comment..." />
+      <button id="send">Send</button>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        collection,
+        addDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
+        authDomain: "new-a6.firebaseapp.com",
+        projectId: "new-a6",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let currentUser = null;
+      onAuthStateChanged(auth, (user) => (currentUser = user));
+
+      // 🧠 Lấy ID từ URL
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get("id");
+
+      const productDiv = document.getElementById("product-detail");
+
+      // 📦 Load product
+      const docRef = doc(db, "products", productId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const p = docSnap.data();
+
+        productDiv.innerHTML = `
+      <div class="product">
+        <img src="${p.image}">
+        <div class="product-content">
+          <h2>${p.name}</h2>
+          <p>💰 ${Number(p.price).toLocaleString("vi-VN")}₫</p>
+          <p>${p.desc}</p>
+          <small>👤 ${p.user}</small>
+        </div>
+      </div>
+    `;
+      }
+
+      // 💬 Comments realtime
+      const commentsRef = collection(db, "products", productId, "comments");
+
+      onSnapshot(commentsRef, (snapshot) => {
+        const commentsDiv = document.getElementById("comments");
+        commentsDiv.innerHTML = "";
+
+        snapshot.forEach((c) => {
+          const data = c.data();
+          commentsDiv.innerHTML += `
+        <p><b>${data.user}:</b> ${data.text}</p>
+      `;
+        });
+      });
+
+      // ➕ Add comment
+      document.getElementById("send").onclick = async () => {
+        if (!currentUser) {
+          alert("Login first!");
+          return;
+        }
+
+        const text = document.getElementById("commentInput").value;
+
+        await addDoc(collection(db, "products", productId, "comments"), {
+          text: text,
+          user: currentUser.email,
+          createdAt: new Date(),
+        });
+
+        commentInput.value = "";
+      };
+    </script>
+  </body>
+</html>

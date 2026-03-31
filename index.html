@@ -164,7 +164,7 @@
             const p = doc.data();
 
             productList.innerHTML += `
-  <div class="product">
+  <div class="product" onclick="goToProduct('${doc.id}')">
     <img src="${p.image}">
 
     <div class="product-content">
@@ -221,6 +221,9 @@
     `;
           });
         });
+        window.goToProduct = (id) => {
+          window.location.href = "product.html?id=" + id;
+        };
       </script>
     </div>
   </body>
