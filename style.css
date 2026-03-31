@@ -102,10 +102,11 @@ button:hover {
 
 /* 🧴 IMAGE (FIX QUAN TRỌNG) */
 .product > img {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
   display: block;
-  border-radius: 10px;
+  margin: auto;
 }
 
 /* CONTENT */
