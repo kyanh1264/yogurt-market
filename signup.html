@@ -85,6 +85,69 @@
           alert(err.message);
         }
       };
+
+      document.getElementById("signup").onclick = async () => {
+        const btn = document.getElementById("signup");
+
+        try {
+          const usernameValue = username.value.trim();
+          const emailValue = email.value.trim();
+          const passwordValue = password.value.trim();
+
+          if (!usernameValue || !emailValue || !passwordValue) {
+            alert("Fill all fields!");
+            return;
+          }
+
+          if (usernameValue.length < 3) {
+            alert("Username too short!");
+            return;
+          }
+
+          if (passwordValue.length < 6) {
+            alert("Password must be at least 6 characters!");
+            return;
+          }
+
+          // 🔥 check trùng username
+          const q = query(
+            collection(db, "users"),
+            where("username", "==", usernameValue),
+          );
+
+          const snap = await getDocs(q);
+
+          if (!snap.empty) {
+            alert("Username already taken!");
+            return;
+          }
+
+          btn.disabled = true;
+          btn.innerText = "Creating...";
+
+          const userCred = await createUserWithEmailAndPassword(
+            auth,
+            emailValue,
+            passwordValue,
+          );
+
+          await updateProfile(userCred.user, {
+            displayName: usernameValue,
+          });
+
+          await addDoc(collection(db, "users"), {
+            uid: userCred.user.uid,
+            email: emailValue,
+            username: usernameValue,
+          });
+
+          alert("Account created!");
+          window.location.href = "login.html";
+        } catch (err) {
+          console.error(err);
+          alert(err.message);
+        }
+      };
     </script>
   </body>
 </html>
