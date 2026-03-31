@@ -100,15 +100,6 @@ button:hover {
   transform: translateY(-5px);
 }
 
-/* 🧴 IMAGE (FIX QUAN TRỌNG) */
-.product > img {
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: auto;
-}
-
 /* CONTENT */
 .product-content {
   padding: 10px;
@@ -198,4 +189,19 @@ button:hover {
   height: 120px;
   border-radius: 50%;
   border: 4px solid #111;
+}
+
+.home-page .product > img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.product-page .product > img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: auto;
 }
