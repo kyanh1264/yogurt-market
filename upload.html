@@ -4,6 +4,7 @@
     <title>Upload Product</title>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <div id="upload-form" style="display: none">
       <div class="container">
@@ -20,28 +21,21 @@
     </div>
 
     <script type="module">
-      const q = query(
-        collection(db, "users"),
-        where("uid", "==", currentUser.uid),
-      );
-      const snap = await getDocs(q);
-
-      let username = "Unknown";
-
-      snap.forEach((doc) => {
-        username = doc.data().username;
-      });
+      // 🔥 IMPORT 1 LẦN DUY NHẤT
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
       import {
         getFirestore,
         collection,
         addDoc,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
       import {
         getAuth,
         onAuthStateChanged,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+      // CONFIG
       const firebaseConfig = {
         apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
         authDomain: "new-a6.firebaseapp.com",
@@ -55,35 +49,51 @@
       const db = getFirestore(app);
       const auth = getAuth(app);
 
+      // ELEMENTS
+      const name = document.getElementById("name");
+      const price = document.getElementById("price");
+      const desc = document.getElementById("desc");
+      const imageUrl = document.getElementById("imageUrl");
+      const form = document.getElementById("upload-form");
+
       let currentUser = null;
 
+      // 🔐 CHECK LOGIN
       onAuthStateChanged(auth, (user) => {
         if (!user) {
           alert("Login first!");
           window.location.href = "login.html";
-        } else {
-          currentUser = user;
+          return;
         }
+
+        currentUser = user;
+        form.style.display = "block"; // 👉 hiện form sau khi login
       });
 
+      // UPLOAD
       document.getElementById("upload").onclick = async () => {
-        await addDoc(collection(db, "products"), {
-          name: name.value,
-          price: price.value,
-          desc: desc.value,
-          image: imageUrl.value,
-          user: currentUser.displayName,
-          createdAt: new Date(),
-        });
+        try {
+          if (!name.value || !price.value || !imageUrl.value) {
+            alert("Fill all fields!");
+            return;
+          }
 
-        alert("Uploaded!");
+          await addDoc(collection(db, "products"), {
+            name: name.value,
+            price: price.value,
+            desc: desc.value,
+            image: imageUrl.value,
+            user: currentUser.displayName || currentUser.email,
+            createdAt: new Date(),
+          });
+
+          alert("Uploaded!");
+          window.location.href = "index.html";
+        } catch (err) {
+          console.error(err);
+          alert(err.message);
+        }
       };
-      import {
-        collection,
-        query,
-        where,
-        getDocs,
-      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     </script>
   </body>
 </html>
