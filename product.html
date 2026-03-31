@@ -130,7 +130,7 @@
 
         await addDoc(collection(db, "products", productId, "comments"), {
           text: text,
-          user: currentUser.displayName || currentUser.email,
+          user: username,
           createdAt: serverTimestamp(),
         });
 

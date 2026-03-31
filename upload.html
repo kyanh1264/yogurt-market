@@ -33,7 +33,11 @@
         getAuth,
         onAuthStateChanged,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
+      import {
+        query,
+        where,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
       // CONFIG
       const firebaseConfig = {
         apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
@@ -58,7 +62,9 @@
       let currentUser = null;
 
       // 🔐 CHECK LOGIN
-      onAuthStateChanged(auth, (user) => {
+      let username = "";
+
+      onAuthStateChanged(auth, async (user) => {
         if (!user) {
           alert("Login first!");
           window.location.href = "login.html";
@@ -66,7 +72,17 @@
         }
 
         currentUser = user;
-        form.style.display = "block"; // 👉 hiện form sau khi login
+
+        // 🔥 lấy username từ Firestore
+        const q = query(collection(db, "users"), where("uid", "==", user.uid));
+
+        const snap = await getDocs(q);
+
+        snap.forEach((doc) => {
+          username = doc.data().username;
+        });
+
+        document.getElementById("upload-form").style.display = "block";
       });
 
       // UPLOAD
@@ -82,7 +98,7 @@
             price: price.value,
             desc: desc.value,
             image: imageUrl.value,
-            user: currentUser.displayName || currentUser.email,
+            user: username, // ✅ chuẩn
             createdAt: new Date(),
           });
 

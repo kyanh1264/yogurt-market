@@ -80,8 +80,8 @@
           // 💾 lưu vào Firestore
           await addDoc(collection(db, "users"), {
             uid: userCred.user.uid,
-            email: email.value,
-            username: username.value,
+            email: emailValue,
+            username: usernameValue,
           });
 
           alert("Account created!");
