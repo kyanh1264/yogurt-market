@@ -18,6 +18,17 @@
     </div>
 
     <script type="module">
+      const q = query(
+        collection(db, "users"),
+        where("uid", "==", currentUser.uid),
+      );
+      const snap = await getDocs(q);
+
+      let username = "Unknown";
+
+      snap.forEach((doc) => {
+        username = doc.data().username;
+      });
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
       import {
         getFirestore,
@@ -56,12 +67,18 @@
           price: price.value,
           desc: desc.value,
           image: imageUrl.value,
-          user: currentUser.email,
+          user: currentUser.displayName || currentUser.email,
           createdAt: new Date(),
         });
 
         alert("Uploaded!");
       };
+      import {
+        collection,
+        query,
+        where,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     </script>
   </body>
 </html>
