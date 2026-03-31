@@ -37,3 +37,14 @@ function displayProducts() {
 
 // run on load
 displayProducts();
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    alert("Login first!");
+    window.location.href = "login.html";
+  } else {
+    currentUser = user;
+
+    document.getElementById("upload-form").style.display = "block";
+  }
+});
