@@ -24,7 +24,14 @@
         getAuth,
         signInWithEmailAndPassword,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        query,
+        where,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
       // CONFIG
       const firebaseConfig = {
         apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
