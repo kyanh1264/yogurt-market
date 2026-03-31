@@ -7,7 +7,14 @@
   </head>
   <body>
     <div class="container">
-      <h1>🍦 10A6 Yogurt</h1>
+      <div class="navbar">
+        <h2>🍦 10A6 Yogurt</h2>
+
+        <div>
+          <a href="login.html" class="nav-btn">Sign In</a>
+          <a href="login.html" class="nav-btn">Sign Up</a>
+        </div>
+      </div>
 
       <!-- AUTH -->
       <div class="auth-box">
@@ -159,11 +166,17 @@
             productList.innerHTML += `
   <div class="product">
     <img src="${p.image}">
+
     <div class="product-content">
+      
+      <div class="user-info">
+        <img src="https://ui-avatars.com/api/?name=${p.user}" class="avatar">
+        <span>${p.user}</span>
+      </div>
+
       <h3>${p.name}</h3>
-      <p>💰 $${p.price}</p>
+      <p>${formatVND(p.price)}</p>
       <p>${p.desc}</p>
-      <small>👤 ${p.user}</small>
 
       <div class="comments" id="comments-${doc.id}"></div>
 
