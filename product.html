@@ -5,6 +5,7 @@
     <title>Product</title>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <div class="container">
       <a href="index.html">⬅ Back</a>
@@ -20,6 +21,7 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
       import {
         getFirestore,
         doc,
@@ -27,14 +29,17 @@
         collection,
         addDoc,
         onSnapshot,
+        serverTimestamp,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
       import {
         getAuth,
         onAuthStateChanged,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+      // CONFIG
       const firebaseConfig = {
-        apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
+        apiKey: "AIzaSy...",
         authDomain: "new-a6.firebaseapp.com",
         projectId: "new-a6",
       };
@@ -43,36 +48,50 @@
       const db = getFirestore(app);
       const auth = getAuth(app);
 
+      // USER
       let currentUser = null;
       onAuthStateChanged(auth, (user) => (currentUser = user));
 
-      // 🧠 Lấy ID từ URL
+      // 🧠 LẤY ID
       const params = new URLSearchParams(window.location.search);
       const productId = params.get("id");
 
+      if (!productId) {
+        alert("Product not found!");
+        window.location.href = "index.html";
+      }
+
+      // 📦 LOAD PRODUCT
       const productDiv = document.getElementById("product-detail");
 
-      // 📦 Load product
       const docRef = doc(db, "products", productId);
       const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
+      if (!docSnap.exists()) {
+        productDiv.innerHTML = "<p>Product not found</p>";
+      } else {
         const p = docSnap.data();
 
         productDiv.innerHTML = `
-      <div class="product">
-        <img src="${p.image}">
-        <div class="product-content">
-          <h2>${p.name}</h2>
-          <p>💰 ${Number(p.price).toLocaleString("vi-VN")}₫</p>
-          <p>${p.desc}</p>
-          <small>👤 ${p.user}</small>
+    <div class="product">
+      <img src="${p.image}">
+      <div class="product-content">
+
+        <div class="user-info">
+          <img src="https://ui-avatars.com/api/?name=${p.user}" class="avatar">
+          <span>${p.user}</span>
         </div>
+
+        <h2>${p.name}</h2>
+        <p class="product-price">${Number(p.price).toLocaleString("vi-VN")}₫</p>
+        <p>${p.desc}</p>
+
       </div>
-    `;
+    </div>
+  `;
       }
 
-      // 💬 Comments realtime
+      // 💬 COMMENTS REALTIME
       const commentsRef = collection(db, "products", productId, "comments");
 
       onSnapshot(commentsRef, (snapshot) => {
@@ -81,28 +100,38 @@
 
         snapshot.forEach((c) => {
           const data = c.data();
+
           commentsDiv.innerHTML += `
-        <p><b>${data.user}:</b> ${data.text}</p>
-      `;
+      <div class="comment">
+        <img src="https://ui-avatars.com/api/?name=${data.user}" class="avatar">
+        <p><b>${data.user}</b>: ${data.text}</p>
+      </div>
+    `;
         });
       });
 
-      // ➕ Add comment
+      // ➕ ADD COMMENT
       document.getElementById("send").onclick = async () => {
         if (!currentUser) {
           alert("Login first!");
           return;
         }
 
-        const text = document.getElementById("commentInput").value;
+        const input = document.getElementById("commentInput");
+        const text = input.value.trim();
+
+        if (!text) {
+          alert("Write something!");
+          return;
+        }
 
         await addDoc(collection(db, "products", productId, "comments"), {
           text: text,
-          user: currentUser.email,
-          createdAt: new Date(),
+          user: currentUser.displayName || currentUser.email,
+          createdAt: serverTimestamp(),
         });
 
-        commentInput.value = "";
+        input.value = "";
       };
     </script>
   </body>

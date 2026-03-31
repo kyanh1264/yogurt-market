@@ -4,6 +4,7 @@
     <title>Login</title>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <div class="container">
       <h2>Login</h2>
@@ -18,11 +19,13 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
       import {
         getAuth,
         signInWithEmailAndPassword,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+      // CONFIG
       const firebaseConfig = {
         apiKey: "AIzaSy...",
         authDomain: "new-a6.firebaseapp.com",
@@ -32,9 +35,28 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
 
+      // ELEMENTS
+      const email = document.getElementById("email");
+      const password = document.getElementById("password");
+
+      // LOGIN
       document.getElementById("login").onclick = async () => {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-        window.location.href = "index.html";
+        try {
+          // ✅ validate
+          if (!email.value || !password.value) {
+            alert("Fill all fields!");
+            return;
+          }
+
+          // 🔐 login
+          await signInWithEmailAndPassword(auth, email.value, password.value);
+
+          alert("Logged in!");
+          window.location.href = "index.html";
+        } catch (err) {
+          console.error(err);
+          alert(err.message);
+        }
       };
     </script>
   </body>

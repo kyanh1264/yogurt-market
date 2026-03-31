@@ -2,191 +2,160 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>10A6</title>
+    <title>10A6 Yogurt</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <div class="container">
-      <div class="nav-right">
-        <h2>🍦 10A6 Yogurt</h2>
 
-        <div>
-          <a href="login.html" class="nav-btn">Sign In</a>
-          <a href="login.html" class="nav-btn">Sign Up</a>
-          <a href="upload.html" class="nav-btn">+ Upload</a>
+  <body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+      <h2>🍦 10A6 Yogurt</h2>
+
+      <div id="nav-right">
+        <!-- JS sẽ xử lý -->
+      </div>
+    </div>
+
+    <!-- PRODUCT LIST -->
+    <div class="container">
+      <div id="product-list"></div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        onSnapshot,
+        query,
+        orderBy,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+      // CONFIG
+      const firebaseConfig = {
+        apiKey: "AIzaSy...",
+        authDomain: "new-a6.firebaseapp.com",
+        projectId: "new-a6",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      // ELEMENTS
+      const productList = document.getElementById("product-list");
+      const navRight = document.getElementById("nav-right");
+
+      // FORMAT PRICE
+      function formatVND(price) {
+        return Number(price).toLocaleString("vi-VN") + "₫";
+      }
+
+      // USER STATE
+      let currentUser = null;
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+
+          const avatarUrl = `https://ui-avatars.com/api/?name=${user.displayName || user.email}`;
+
+          navRight.innerHTML = `
+      <img src="${avatarUrl}" class="nav-avatar" onclick="goProfile()">
+      <a href="upload.html" class="nav-btn">+ Upload</a>
+    `;
+        } else {
+          currentUser = null;
+
+          navRight.innerHTML = `
+      <a href="login.html" class="nav-btn">Sign In</a>
+      <a href="signup.html" class="nav-btn">Sign Up</a>
+    `;
+        }
+      });
+
+      // GO PROFILE
+      window.goProfile = () => {
+        window.location.href = "profile.html";
+      };
+
+      // GO PRODUCT
+      window.goToProduct = (id) => {
+        window.location.href = "product.html?id=" + id;
+      };
+
+      // LOAD PRODUCTS
+      const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+
+      onSnapshot(q, (snapshot) => {
+        productList.innerHTML = "";
+
+        snapshot.forEach((docSnap) => {
+          const p = docSnap.data();
+          const id = docSnap.id;
+
+          productList.innerHTML += `
+      <div class="product" onclick="goToProduct('${id}')">
+        <img src="${p.image}">
+
+        <div class="product-content">
+
+          <div class="user-info">
+            <img src="https://ui-avatars.com/api/?name=${p.user}" class="avatar">
+            <span>${p.user}</span>
+          </div>
+
+          <h3>${p.name}</h3>
+          <p class="product-price">${formatVND(p.price)}</p>
+
         </div>
       </div>
-
-      <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import {
-          getFirestore,
-          collection,
-          addDoc,
-          onSnapshot,
-          query,
-          orderBy,
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import {
-          getAuth,
-          createUserWithEmailAndPassword,
-          signInWithEmailAndPassword,
-          signOut,
-          onAuthStateChanged,
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-        // YOUR CONFIG
-        const firebaseConfig = {
-          apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
-          authDomain: "new-a6.firebaseapp.com",
-          projectId: "new-a6",
-          storageBucket: "new-a6.firebasestorage.app",
-          messagingSenderId: "147870885951",
-          appId: "1:147870885951:web:50ae6057e1b97054e8308a",
-        };
-
-        // Init
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // ELEMENTS
-        const email = document.getElementById("email");
-        const password = document.getElementById("password");
-        const userInfo = document.getElementById("user-info");
-
-        const productList = document.getElementById("product-list");
-
-        // AUTH
-        document.getElementById("signup").onclick = async () => {
-          try {
-            await createUserWithEmailAndPassword(
-              auth,
-              email.value,
-              password.value,
-            );
-            alert("Account created!");
-          } catch (e) {
-            alert(e.message);
-          }
-        };
-
-        document.getElementById("login").onclick = async () => {
-          try {
-            await signInWithEmailAndPassword(auth, email.value, password.value);
-            alert("Logged in!");
-          } catch (e) {
-            alert(e.message);
-          }
-        };
-
-        document.getElementById("logout").onclick = async () => {
-          await signOut(auth);
-        };
-
-        // USER STATE
-        let currentUser = null;
-
-        const navRight = document.getElementById("nav-right");
-
-        onAuthStateChanged(auth, (user) => {
-          if (user) {
-            currentUser = user;
-
-            // avatar từ tên
-            const avatarUrl = `https://ui-avatars.com/api/?name=${user.email}`;
-
-            navRight.innerHTML = `
-      <img src="${avatarUrl}" class="nav-avatar" onclick="goProfile()">
     `;
-          } else {
-            currentUser = null;
 
-            navRight.innerHTML = `
-      <a href="login.html" class="nav-btn">Sign In</a>
-      <a href="login.html" class="nav-btn">Sign Up</a>
-    `;
-          }
-        });
+          // 💬 COMMENTS REALTIME (đặt đúng chỗ)
+          const commentsRef = collection(db, "products", id, "comments");
 
-        window.goProfile = () => {
-          window.location.href = "profile.html";
-        };
-        // DISPLAY PRODUCTS (REALTIME)
-        const q = query(
-          collection(db, "products"),
-          orderBy("createdAt", "desc"),
-        );
+          onSnapshot(commentsRef, (snap) => {
+            const box = document.getElementById("comments-" + id);
+            if (!box) return;
 
-        onSnapshot(q, (snapshot) => {
-          productList.innerHTML = "";
+            box.innerHTML = "";
 
-          snapshot.forEach((doc) => {
-            const p = doc.data();
-
-            productList.innerHTML += `
-  <div class="product" onclick="goToProduct('${doc.id}')">
-    <img src="${p.image}">
-
-    <div class="product-content">
-      
-      <div class="user-info">
-        <img src="https://ui-avatars.com/api/?name=${p.user}" class="avatar">
-        <span>${p.user}</span>
-      </div>
-
-      <h3>${p.name}</h3>
-      <p>${formatVND(p.price)}</p>
-      <p>${p.desc}</p>
-
-      <div class="comments" id="comments-${doc.id}"></div>
-
-      <input type="text" id="input-${doc.id}" placeholder="Write comment...">
-      <button onclick="addComment('${doc.id}')">Send</button>
-    </div>
-  </div>
-`;
+            snap.forEach((c) => {
+              const data = c.data();
+              box.innerHTML += `<p><b>${data.user}:</b> ${data.text}</p>`;
+            });
           });
         });
+      });
 
-        window.addComment = async (productId) => {
-          if (!currentUser) {
-            alert("Login first!");
-            return;
-          }
+      // ADD COMMENT
+      window.addComment = async (productId) => {
+        if (!currentUser) {
+          alert("Login first!");
+          return;
+        }
 
-          const input = document.getElementById("input-" + productId);
-          const text = input.value;
+        const input = document.getElementById("input-" + productId);
+        const text = input.value;
 
-          if (!text) return;
+        if (!text) return;
 
-          await addDoc(collection(db, "products", productId, "comments"), {
-            text: text,
-            user: currentUser.email,
-            createdAt: new Date(),
-          });
-
-          input.value = "";
-        };
-
-        const commentsRef = collection(db, "products", doc.id, "comments");
-
-        onSnapshot(commentsRef, (snapshot) => {
-          const commentBox = document.getElementById("comments-" + doc.id);
-          commentBox.innerHTML = "";
-
-          snapshot.forEach((c) => {
-            const data = c.data();
-            commentBox.innerHTML += `
-      <p><b>${data.user}:</b> ${data.text}</p>
-    `;
-          });
+        await addDoc(collection(db, "products", productId, "comments"), {
+          text: text,
+          user: currentUser.displayName || currentUser.email,
+          createdAt: new Date(),
         });
-        window.goToProduct = (id) => {
-          window.location.href = "product.html?id=" + id;
-        };
-      </script>
-    </div>
+
+        input.value = "";
+      };
+    </script>
   </body>
 </html>
