@@ -76,16 +76,20 @@
         const p = docSnap.data();
 
         productDiv.innerHTML = `
-<div class="product-detail">
-  <img src="${p.image}" class="product-detail-img">
+    <div class="product">
+      <img src="${p.image}">
+      <div class="product-content">
 
-  <div class="product-content">
-    <h2>${p.name}</h2>
-    <p>${Number(p.price).toLocaleString("vi-VN")}₫</p>
-    <p>${p.desc}</p>
-    <small>${p.user}</small>
-  </div>
-</div>
+        <div class="user-info">
+          <img src="https://ui-avatars.com/api/?name=${p.user}" class="avatar">
+          <span>${p.user}</span>
+        </div>
+
+        <h2>${p.name}</h2>
+        <p class="product-price">${Number(p.price).toLocaleString("vi-VN")}₫</p>
+        <p>${p.desc}</p>
+
+      </div>
     </div>
   `;
       }
