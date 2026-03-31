@@ -170,3 +170,10 @@ button:hover {
   border-radius: 15px;
   margin-bottom: 20px;
 }
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
