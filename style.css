@@ -90,9 +90,10 @@ button:hover {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(15px);
   border-radius: 15px;
-  overflow: hidden;
   transition: 0.3s;
   cursor: pointer;
+
+  overflow: visible;
 }
 
 .product:hover {
@@ -103,8 +104,8 @@ button:hover {
 .product > img {
   width: 100%;
   height: auto;
-  object-fit: cover;
   display: block;
+  border-radius: 10px;
 }
 
 /* CONTENT */
