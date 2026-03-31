@@ -7,7 +7,7 @@
   </head>
   <body>
     <div class="container">
-      <div class="navbar">
+      <div class="nav-right">
         <h2>🍦 10A6 Yogurt</h2>
 
         <div>
@@ -115,15 +115,31 @@
         // USER STATE
         let currentUser = null;
 
+        const navRight = document.getElementById("nav-right");
+
         onAuthStateChanged(auth, (user) => {
           if (user) {
             currentUser = user;
-            userInfo.innerText = "Logged in: " + user.email;
+
+            // avatar từ tên
+            const avatarUrl = `https://ui-avatars.com/api/?name=${user.email}`;
+
+            navRight.innerHTML = `
+      <img src="${avatarUrl}" class="nav-avatar" onclick="goProfile()">
+    `;
           } else {
             currentUser = null;
-            userInfo.innerText = "Not logged in";
+
+            navRight.innerHTML = `
+      <a href="login.html" class="nav-btn">Sign In</a>
+      <a href="login.html" class="nav-btn">Sign Up</a>
+    `;
           }
         });
+
+        window.goProfile = () => {
+          alert("Profile page coming soon");
+        };
 
         // UPLOAD PRODUCT
         const imageUrl = document.getElementById("imageUrl");

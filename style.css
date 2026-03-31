@@ -147,3 +147,19 @@ button:hover {
 .product {
   cursor: pointer;
 }
+
+.nav-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.nav-btn {
+  margin-left: 10px;
+  padding: 8px 15px;
+  border-radius: 8px;
+  background: #0072ff;
+  color: white;
+  text-decoration: none;
+}
