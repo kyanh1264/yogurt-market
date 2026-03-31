@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <a href="index.html">⬅ Back</a>
+
+      <div class="profile-box" id="profile-box"></div>
+
+      <h2>Your Products</h2>
+      <div id="product-list"></div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        query,
+        where,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBLTbTBct5J8trw8wSaCQ9jMFtzLd0mB3M",
+        authDomain: "new-a6.firebaseapp.com",
+        projectId: "new-a6",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      const profileBox = document.getElementById("profile-box");
+      const productList = document.getElementById("product-list");
+
+      function formatVND(price) {
+        return Number(price).toLocaleString("vi-VN") + "₫";
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          alert("Login first!");
+          window.location.href = "login.html";
+          return;
+        }
+
+        const avatar = `https://ui-avatars.com/api/?name=${user.email}`;
+
+        // 👤 PROFILE UI
+        profileBox.innerHTML = `
+      <div style="text-align:center; margin-bottom:20px;">
+        <img src="${avatar}" style="width:80px; border-radius:50%;">
+        <h3>${user.email}</h3>
+        <button onclick="logout()">Logout</button>
+      </div>
+    `;
+
+        // 🧴 LOAD USER PRODUCTS
+        const q = query(
+          collection(db, "products"),
+          where("user", "==", user.email),
+        );
+
+        onSnapshot(q, (snapshot) => {
+          productList.innerHTML = "";
+
+          snapshot.forEach((doc) => {
+            const p = doc.data();
+
+            productList.innerHTML += `
+          <div class="product">
+            <img src="${p.image}">
+            <div class="product-content">
+              <h3>${p.name}</h3>
+              <p class="product-price">${formatVND(p.price)}</p>
+              <p>${p.desc}</p>
+            </div>
+          </div>
+        `;
+          });
+        });
+      });
+
+      // 🚪 LOGOUT
+      window.logout = async () => {
+        await signOut(auth);
+        window.location.href = "index.html";
+      };
+    </script>
+  </body>
+</html>
