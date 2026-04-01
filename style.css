@@ -210,3 +210,33 @@ button:hover {
 .product {
   overflow: visible;
 }
+
+/* 👤 PROFILE PAGE GRID */
+.profile-page #product-list {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+/* 👤 CARD NHỎ HƠN */
+.profile-page .product {
+  transform: scale(0.95);
+}
+
+/* 👤 TEXT NHỎ LẠI */
+.profile-page .product h3 {
+  font-size: 14px;
+}
+
+.profile-page .product p {
+  font-size: 12px;
+}
+
+/* 👤 AVATAR NHỎ */
+.profile-page .user-info img {
+  width: 24px;
+  height: 24px;
+}
+
+.profile-page #product-list {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 15px;
+}
